@@ -1,65 +1,58 @@
 package mk.finki.ukim.mk.emt.web;
 
-import mk.finki.ukim.mk.emt.model.domain.Accommodation;
-import mk.finki.ukim.mk.emt.service.AccommodationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import mk.finki.ukim.mk.emt.dto.CreateAccommodationDto;
+import mk.finki.ukim.mk.emt.dto.DisplayAccommodationDto;
+import mk.finki.ukim.mk.emt.service.application.AccommodationApplicationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/accommodations")
-
+@Tag(name = "Accommodation API", description = "Endpoints for managing accommodations")
 public class AccommodationController {
 
-    private final AccommodationService accommodationService;
+    private final AccommodationApplicationService accommodationApplicationService;
 
-    public AccommodationController(AccommodationService accommodationService) {
-        this.accommodationService = accommodationService;
+    public AccommodationController(AccommodationApplicationService accommodationApplicationService) {
+        this.accommodationApplicationService = accommodationApplicationService;
     }
-
 
     @GetMapping
-    public List<Accommodation> findAll() {
-        return accommodationService.findAll();
+    public List<DisplayAccommodationDto> findAll() {
+        return this.accommodationApplicationService.findAll();
     }
-
 
     @GetMapping("/{id}")
-    public ResponseEntity<Accommodation> findById(@PathVariable Long id) {
-        Optional<Accommodation> accommodation = accommodationService.findById(id);
-        return accommodation.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<DisplayAccommodationDto> findById(@PathVariable Long id) {
+        return this.accommodationApplicationService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-
 
     @PostMapping("/add")
-    public ResponseEntity<Accommodation> save(@RequestBody Accommodation accommodation) {
-        Optional<Accommodation> savedAccommodation = accommodationService.save(accommodation);
-        return savedAccommodation.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
+    public ResponseEntity<DisplayAccommodationDto> save(@RequestBody CreateAccommodationDto createAccommodationDto) {
+        return this.accommodationApplicationService.save(createAccommodationDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Accommodation> update(@PathVariable Long id, @RequestBody Accommodation accommodation) {
-        Optional<Accommodation> updatedAccommodation = accommodationService.update(id, accommodation);
-        return updatedAccommodation.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<DisplayAccommodationDto> update(@PathVariable Long id, @RequestBody CreateAccommodationDto createAccommodationDto) {
+        return this.accommodationApplicationService.update(id, createAccommodationDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        if (accommodationService.findById(id).isPresent()) {
-            accommodationService.deleteById(id);
-            return ResponseEntity.noContent().build();
+        if (this.accommodationApplicationService.findById(id).isPresent()) {
+            this.accommodationApplicationService.deleteById(id);
+            return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @PatchMapping("/rent/{id}")
-    public ResponseEntity<Accommodation> markAsRented(@PathVariable Long id) {
-        Optional<Accommodation> rentedAccommodation = Optional.ofNullable(accommodationService.markAsRented(id));
-        return rentedAccommodation.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -21,6 +21,11 @@ public class Country {
         this.name = name;
         this.continent = continent;
     }
+    public Country(String name,String continent) {
+
+        this.name = name;
+        this.continent = continent;
+    }
 
     public Country() {}
 

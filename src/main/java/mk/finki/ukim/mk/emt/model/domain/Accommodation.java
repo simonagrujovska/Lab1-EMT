@@ -19,13 +19,23 @@ public class Accommodation {
     @ManyToOne
     private Host host;
 
-    private int numRooms;
+    private Integer numRooms;
     private boolean rented;
 
 
     public Accommodation() {}
 
     public Accommodation(Long id, String name, CategoryEnum category, Host host, int numRooms) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.host = host;
+        this.numRooms = numRooms;
+        this.rented = false;
+
+    }
+
+    public Accommodation(String name, CategoryEnum category, Host host, int numRooms) {
         this.id = id;
         this.name = name;
         this.category = category;
